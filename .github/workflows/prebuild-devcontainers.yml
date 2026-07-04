@@ -79,7 +79,10 @@ jobs:
       - name: Generate devcontainer.json for ${{ matrix.release }}
         env:
           RELEASE: ${{ matrix.release }}
-          OUT_FILE: /tmp/devcontainer.${{ matrix.release }}.json
+          # Written into the repo root (not /tmp) because build.dockerfile/build.context
+          # in the config are relative paths, resolved against the config file's own
+          # directory - it needs to sit next to the real Dockerfile to find it.
+          OUT_FILE: devcontainer.generated.${{ matrix.release }}.json
         run: |
           set -euo pipefail
           # mag-lab-matlab-devontainer.json is JSONC (comments + a trailing comma before
@@ -106,7 +109,7 @@ jobs:
       - name: Build and push devcontainer image
         uses: devcontainers/ci@v0.3
         with:
-          configFile: /tmp/devcontainer.${{ matrix.release }}.json
+          configFile: devcontainer.generated.${{ matrix.release }}.json
           imageName: ${{ steps.image.outputs.name }}
           imageTag: ${{ matrix.release }}
           cacheFrom: ${{ steps.image.outputs.name }}:${{ matrix.release }}
