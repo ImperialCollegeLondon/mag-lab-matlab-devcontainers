@@ -33,7 +33,7 @@ every ~2 weeks and publishes it to GHCR, tagged by release:
 ghcr.io/imperialcollegelondon/mag-lab-matlab-devcontainers:r2026a
 ghcr.io/imperialcollegelondon/mag-lab-matlab-devcontainers:r2025b
 ghcr.io/imperialcollegelondon/mag-lab-matlab-devcontainers:r2025a
-ghcr.io/imperialcollegelondon/mag-lab-matlab-devcontainers:r2024by
+ghcr.io/imperialcollegelondon/mag-lab-matlab-devcontainers:r2024b
 ```
 
 In another project, point your `.devcontainer/devcontainer.json` at the image
