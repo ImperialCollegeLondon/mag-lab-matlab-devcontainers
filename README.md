@@ -6,9 +6,18 @@ Registry so other projects don't have to pay the MATLAB install time themselves.
 
 ## What's included
 
-- MATLAB (release configurable, see below) with Statistics & Machine Learning,
-  Signal Processing, Curve Fitting, Optimization, Control System, Mapping and
-  Communications toolboxes
+- MATLAB (release configurable, see below) with these toolboxes installed:
+  - Statistics and Machine Learning Toolbox
+  - Signal Processing Toolbox
+  - Curve Fitting Toolbox
+  - Optimization Toolbox
+  - MATLAB Report Generator
+  - Control System Toolbox
+  - Mapping Toolbox
+  - Communications Toolbox
+- [MATLAB Package Manager (mpm)](https://www.mathworks.com/help/install/ug/mpminstall.html) —
+  add further products at any time without a full rebuild, e.g.
+  `mpm install --destination=/opt/matlab/R2026a --products Deep_Learning_Toolbox`
 - [matlab-proxy](https://github.com/mathworks/matlab-proxy) — browser-based MATLAB desktop
 - [NASA NAIF MICE](https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/MATLAB/req/mice.html) toolkit
 - [NASA CDF](https://cdf.gsfc.nasa.gov/quickstartguides/MATLAB/) MATLAB patch
