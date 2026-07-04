@@ -42,7 +42,11 @@
         "TESTCONTAINERS_HOST_OVERRIDE": "host.docker.internal"
     },
 
-    "postCreateCommand": "sudo chown -R vscode:vscode $HOME/.claude",
+    // mkdir -p because this postCreateCommand is baked into the image's
+    // devcontainer.metadata label and runs for anyone consuming the prebuilt image
+    // via "image": "..." too - $HOME/.claude won't exist there unless they also
+    // mount a claude-code config volume, so this must not assume it's present.
+    "postCreateCommand": "mkdir -p $HOME/.claude && sudo chown -R vscode:vscode $HOME/.claude",
     // install poetry in first startup in vscode
     "postStartCommand": "",
 

@@ -55,6 +55,19 @@ directly instead of building it, e.g.:
 This skips the MATLAB install entirely (10-20+ minutes) — see [available tags](
 https://github.com/orgs/ImperialCollegeLondon/packages/container/package/mag-lab-matlab-devcontainers).
 
+### Live example / demo in GitHub Codespaces
+
+[`.devcontainer/devcontainer.json`](.devcontainer/devcontainer.json) in this repo *is*
+a worked example of the snippet above — it points at this repo's own latest prebuilt
+image (currently `r2026a`) instead of building from `../Dockerfile`, and is what
+GitHub Codespaces picks up automatically since it's in the conventional location.
+
+To try it: on this repo's GitHub page, **Code → Codespaces → Create codespace on
+main**. It pulls the prebuilt image (no MATLAB install wait), then forward-opens
+port 8888 for matlab-proxy. Since Codespaces can't reach Imperial's network license
+server, matlab-proxy will prompt you to sign in with a MathWorks account the first
+time you use MATLAB there.
+
 ## Developing this repo / building locally
 
 The devcontainer is defined in [`mag-lab-matlab-devontainer.json`](./mag-lab-matlab-devontainer.json)

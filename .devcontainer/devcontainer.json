@@ -1,0 +1,38 @@
+// Demo devcontainer that consumes this repo's own prebuilt image, rather than
+// building from ../Dockerfile. This is what a *consuming* project's devcontainer.json
+// looks like — see ../README.md for how to use this in GitHub Codespaces.
+{
+    "name": "MATLAB devcontainer demo (prebuilt image)",
+    "image": "ghcr.io/imperialcollegelondon/mag-lab-matlab-devcontainers:r2026a",
+    "remoteUser": "vscode",
+    "containerUser": "vscode",
+
+    // matlab-proxy is baked into the image and starts automatically; this just
+    // controls its port and how VS Code/Codespaces surfaces it.
+    "containerEnv": {
+        "MWI_APP_PORT": "8888"
+    },
+    "forwardPorts": [8888],
+    "portsAttributes": {
+        "8888": {
+            "label": "MATLAB (matlab-proxy)",
+            "onAutoForward": "openPreview"
+        }
+    },
+
+    // MATLAB in this demo container needs a MathWorks Online license (no network
+    // license server is reachable from Codespaces) - matlab-proxy will prompt you
+    // to sign in with your MathWorks account the first time you open it.
+    "hostRequirements": {
+        "cpus": 4
+    },
+
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-python.python",
+                "MathWorks.matlab"
+            ]
+        }
+    }
+}
