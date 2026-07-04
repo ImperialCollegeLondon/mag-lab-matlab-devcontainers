@@ -71,12 +71,30 @@ jobs:
         id: image
         run: echo "name=ghcr.io/$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> "$GITHUB_OUTPUT"
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
       - name: Generate devcontainer.json for ${{ matrix.release }}
+        env:
+          RELEASE: ${{ matrix.release }}
+          OUT_FILE: /tmp/devcontainer.${{ matrix.release }}.json
         run: |
           set -euo pipefail
-          jq --arg rel "${{ matrix.release }}" \
-             '.features["ghcr.io/mathworks/devcontainer-features/matlab:0"].release = $rel' \
-             mag-lab-matlab-devontainer.json > /tmp/devcontainer.${{ matrix.release }}.json
+          # mag-lab-matlab-devontainer.json is JSONC (comments + a trailing comma before
+          # a commented-out feature entry), which jq can't parse. Use the same tolerant
+          # parser VS Code itself uses for JSONC instead of trying to regex it into place.
+          npm install --no-save --no-fund --no-audit jsonc-parser
+          node -e "
+            const { parse } = require('jsonc-parser');
+            const fs = require('fs');
+            const raw = fs.readFileSync('mag-lab-matlab-devontainer.json', 'utf8');
+            const config = parse(raw);
+            config.features['ghcr.io/mathworks/devcontainer-features/matlab:0'].release = process.env.RELEASE;
+            fs.writeFileSync(process.env.OUT_FILE, JSON.stringify(config, null, 2));
+            console.log('Wrote', process.env.OUT_FILE, 'with release', process.env.RELEASE);
+          "
 
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
