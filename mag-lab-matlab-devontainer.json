@@ -16,7 +16,7 @@
         // to build a matrix of the last 4 MATLAB releases. The value here is just the local-dev default.
         "ghcr.io/mathworks/devcontainer-features/matlab:0": {
             "release": "r2026a",
-            "products": "MATLAB Statistics_and_Machine_Learning_Toolbox Signal_Processing_Toolbox Curve_Fitting_Toolbox Optimization_Toolbox Report_Generator Control_System_Toolbox Mapping_Toolbox Communications_Toolbox",
+            "products": "MATLAB Statistics_and_Machine_Learning_Toolbox Signal_Processing_Toolbox Curve_Fitting_Toolbox Optimization_Toolbox MATLAB_Report_Generator Control_System_Toolbox Mapping_Toolbox Communications_Toolbox",
             "installMatlabProxy": true,
             "startInDesktop": "true"
         },

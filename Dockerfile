@@ -23,6 +23,12 @@ RUN pipx ensurepath && \
 
 ENV PATH="/home/vscode/.local/bin:${PATH}"
 
+# MATLAB Package Manager (mpm) - lets you install/add MATLAB products from inside
+# the running container without a full devcontainer rebuild, e.g.:
+#   mpm install --destination=/opt/matlab/R2026a --products Deep_Learning_Toolbox
+RUN sudo wget -q https://www.mathworks.com/mpm/glnxa64/mpm -O /usr/local/bin/mpm && \
+    sudo chmod +x /usr/local/bin/mpm
+
 # NASA NAIF MICE toolkit for MATLAB (precompiled glnxa64, no compiler needed).
 # See https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/MATLAB/req/mice.html
 RUN sudo mkdir -p /opt/naif && sudo chown vscode:vscode /opt/naif && \
