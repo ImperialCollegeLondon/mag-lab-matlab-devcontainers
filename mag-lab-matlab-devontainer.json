@@ -1,0 +1,88 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/debian
+{
+    "build": {
+        "dockerfile": "./Dockerfile",
+        "context": "."
+    },
+    "features": {
+        // allow access to the HOST docker socker for docker desktop
+        "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {
+            "moby": "false"
+        },
+
+        // yuk-  this adds 250secs to build time
+        // NOTE: "release" is overwritten per-build in CI (see .github/workflows/prebuild-devcontainers.yml)
+        // to build a matrix of the last 4 MATLAB releases. The value here is just the local-dev default.
+        "ghcr.io/mathworks/devcontainer-features/matlab:0": {
+            "release": "r2026a",
+            "products": "MATLAB Statistics_and_Machine_Learning_Toolbox Signal_Processing_Toolbox Curve_Fitting_Toolbox",
+            "installMatlabProxy": true,
+            "startInDesktop": "true"
+        },
+        // add nodejs
+        "ghcr.io/devcontainers/features/node:2.1.0": {},
+        "ghcr.io/anthropics/devcontainer-features/claude-code:1.0": {},
+        "ghcr.io/devcontainers/features/github-cli:1": {},
+        // uncommment act if you want to be able to run github actions locally. This needs "docker in docker" setup for devcontainer
+        //"ghcr.io/dhoeric/features/act:1": {}
+    },
+    "remoteEnv": {
+        // add the poetry to the PATH for the dev user vscode
+        "PATH": "/home/vscode/.local/bin:${containerEnv:PATH}",
+
+        // Propagate the GitHub token & Matlab licence server from the local environment to the container for use in scripts
+        // and tools that require authentication.
+        // this saves habing to login to GH when rebuilding dev container
+        "GH_TOKEN": "${localEnv:GH_TOKEN}",
+        "MLM_LICENSE_FILE": "${localEnv:MLM_LICENSE_FILE}",
+
+        // Define WireMock variables to connect Docker outside of Docker.
+        "WIREMOCK_DIND": "1",
+        "TESTCONTAINERS_HOST_OVERRIDE": "host.docker.internal"
+    },
+
+    "postCreateCommand": "sudo chown -R vscode:vscode $HOME/.claude",
+    // install poetry in first startup in vscode
+    "postStartCommand": "",
+
+    // matlab-proxy (started automatically by the matlab feature's startInDesktop option)
+    // serves a browser-based MATLAB desktop on this port.
+    "containerEnv": {
+        "MWI_APP_PORT": "8888"
+    },
+    "portsAttributes": {
+        "8888": {
+            "label": "MATLAB (matlab-proxy)",
+            "onAutoForward": "openPreview"
+        }
+    },
+
+    // Configure tool-specific properties.
+    "customizations": {
+        // Configure properties specific to VS Code.
+        "vscode": {
+            // Set *default* container specific settings.json values on container create.
+            "settings": {
+                
+            },
+            "extensions": [
+                "ms-python.python",
+                "MathWorks.matlab"
+            ]
+        }
+    },
+
+    "mounts": [
+        // shared claude code config volume for all containers so that devcontainer rebuilds maintain config
+        // "source=claude-code-config,target=/home/vscode/.claude,type=volume",
+    ],
+
+    // Use 'forwardPorts' to make a list of ports inside the container available locally.
+    // "forwardPorts": [],
+    // Configure tool-specific properties.
+    // "customizations": {},
+    // Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+    "remoteUser": "vscode",
+    "containerUser": "vscode"
+}

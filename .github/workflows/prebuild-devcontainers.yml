@@ -1,0 +1,96 @@
+name: Prebuild MATLAB devcontainers
+
+# Runs roughly every 2 weeks (1st and 15th of each month), plus manual dispatch,
+# plus on any push that changes the devcontainer definition so breakage is caught early.
+on:
+  schedule:
+    - cron: "0 3 1,15 * *"
+  workflow_dispatch:
+    inputs:
+      releases:
+        description: >
+          Comma-separated MATLAB releases to build (e.g. "r2025b,r2025a"). Leave blank
+          to auto-discover the last 4 releases supported by the mathworks matlab feature.
+        required: false
+        type: string
+  push:
+    branches: [main]
+    paths:
+      - Dockerfile
+      - mag-lab-matlab-devontainer.json
+      - .github/workflows/prebuild-devcontainers.yml
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  discover:
+    name: Discover MATLAB releases
+    runs-on: ubuntu-latest
+    outputs:
+      releases: ${{ steps.discover.outputs.releases }}
+    steps:
+      - name: Discover last 4 supported MATLAB releases
+        id: discover
+        env:
+          OVERRIDE: ${{ github.event.inputs.releases }}
+        run: |
+          set -euo pipefail
+          if [ -n "${OVERRIDE:-}" ]; then
+            JSON=$(echo "$OVERRIDE" | tr ',' '\n' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' \
+                     | tr '[:upper:]' '[:lower:]' | jq -R -s -c 'split("\n") | map(select(length>0))')
+          else
+            # Scrape the matlab devcontainer feature's own supported-release list (newest
+            # first) rather than hardcoding versions, so this pipeline stays current as
+            # MathWorks ships new releases and the feature adds support for them.
+            curl -sf https://raw.githubusercontent.com/mathworks/devcontainer-features/main/src/matlab/install-helper-functions.sh -o helper.sh
+            LINE=$(grep -o '_SUPPORTED_MATLAB_RELEASES=([^)]*)' helper.sh)
+            RELEASES=$(echo "$LINE" | grep -oE '"[Rr][0-9]{4}[ab]"' | tr -d '"')
+            JSON=$(echo "$RELEASES" | head -4 | tr '[:upper:]' '[:lower:]' | jq -R -s -c 'split("\n") | map(select(length>0))')
+          fi
+          echo "Building releases: $JSON"
+          echo "releases=$JSON" >> "$GITHUB_OUTPUT"
+
+  build:
+    name: Build ${{ matrix.release }}
+    needs: discover
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      fail-fast: false
+      matrix:
+        release: ${{ fromJson(needs.discover.outputs.releases) }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Compute lowercase image name
+        id: image
+        run: echo "name=ghcr.io/$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> "$GITHUB_OUTPUT"
+
+      - name: Generate devcontainer.json for ${{ matrix.release }}
+        run: |
+          set -euo pipefail
+          jq --arg rel "${{ matrix.release }}" \
+             '.features["ghcr.io/mathworks/devcontainer-features/matlab:0"].release = $rel' \
+             mag-lab-matlab-devontainer.json > /tmp/devcontainer.${{ matrix.release }}.json
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push devcontainer image
+        uses: devcontainers/ci@v0.3
+        with:
+          configFile: /tmp/devcontainer.${{ matrix.release }}.json
+          imageName: ${{ steps.image.outputs.name }}
+          imageTag: ${{ matrix.release }}
+          cacheFrom: ${{ steps.image.outputs.name }}:${{ matrix.release }}
+          platform: linux/amd64
+          push: always
