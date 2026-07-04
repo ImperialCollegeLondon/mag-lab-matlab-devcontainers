@@ -99,6 +99,13 @@ jobs:
             console.log('Wrote', process.env.OUT_FILE, 'with release', process.env.RELEASE);
           "
 
+      - name: Set up Docker Buildx
+        # devcontainers/ci exports via `docker buildx build --output type=oci`, which
+        # the default "docker" buildx driver on GitHub-hosted runners doesn't support
+        # ("OCI exporter is not supported for the docker driver"). This installs a
+        # docker-container driver builder that does.
+        uses: docker/setup-buildx-action@v3
+
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
         with:
