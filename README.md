@@ -33,7 +33,7 @@ every ~2 weeks and publishes it to GHCR, tagged by release:
 ghcr.io/imperialcollegelondon/mag-lab-matlab-devcontainers:r2026a
 ghcr.io/imperialcollegelondon/mag-lab-matlab-devcontainers:r2025b
 ghcr.io/imperialcollegelondon/mag-lab-matlab-devcontainers:r2025a
-ghcr.io/imperialcollegelondon/mag-lab-matlab-devcontainers:r2024b
+ghcr.io/imperialcollegelondon/mag-lab-matlab-devcontainers:r2024by
 ```
 
 In another project, point your `.devcontainer/devcontainer.json` at the image
@@ -84,10 +84,10 @@ auto-detect it. Either:
 Building the image needs no license — MathWorks' `mpm` only installs product files.
 *Running* MATLAB inside the container does. Set `MLM_LICENSE_FILE` in your shell
 before opening/building the devcontainer and it's passed through automatically
-(`remoteEnv.MLM_LICENSE_FILE` in `mag-lab-matlab-devontainer.json`):
+from the host OS ENV variable $MLM_LICENSE_FILE:
 
 ```sh
-export MLM_LICENSE_FILE=27004@matlab.cc.ic.ac.uk   # Imperial's network license server
+export MLM_LICENSE_FILE=27004@YOUR_LIC_SERVER   # Replace YOUR_LIC_SERVER with your license server
 ```
 
 ### matlab-proxy (browser-based MATLAB)
