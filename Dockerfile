@@ -1,6 +1,9 @@
-
+# syntax=docker/dockerfile:1.7
 # This was based off the default devcontainer for python and customised to support multiple python versions
 # see https://github.com/devcontainers/images/blob/main/src/python/.devcontainer/Dockerfile
+
+FROM scratch AS nasa-deps-cache
+COPY .github/docker-cache/ /cache/
 
 ## we start with the version we want as the system version
 FROM mcr.microsoft.com/devcontainers/python:3.14-trixie
@@ -31,9 +34,14 @@ RUN sudo wget -q https://www.mathworks.com/mpm/glnxa64/mpm -O /usr/local/bin/mpm
 
 # NASA NAIF MICE toolkit for MATLAB (precompiled glnxa64, no compiler needed).
 # See https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/MATLAB/req/mice.html
-RUN sudo mkdir -p /opt/naif && sudo chown vscode:vscode /opt/naif && \
+RUN --mount=from=nasa-deps-cache,source=/cache,target=/tmp/docker-cache \
+    sudo mkdir -p /opt/naif && sudo chown vscode:vscode /opt/naif && \
     cd /opt/naif && \
-    wget -q https://naif.jpl.nasa.gov/pub/naif/toolkit//MATLAB/PC_Linux_GCC_MATLAB9.x_64bit/packages/mice.tar.Z && \
+    if [ -f /tmp/docker-cache/mice.tar.Z ]; then \
+      cp /tmp/docker-cache/mice.tar.Z .; \
+    else \
+      wget -q https://naif.jpl.nasa.gov/pub/naif/toolkit//MATLAB/PC_Linux_GCC_MATLAB9.x_64bit/packages/mice.tar.Z; \
+    fi && \
     zcat mice.tar.Z | tar xf - && \
     rm mice.tar.Z
 
@@ -41,9 +49,14 @@ RUN sudo mkdir -p /opt/naif && sudo chown vscode:vscode /opt/naif && \
 # See https://cdf.gsfc.nasa.gov/quickstartguides/MATLAB/
 # "latest_matlab" tracks the current CDF release; the extracted dir is renamed to a
 # stable path so MATLABPATH below doesn't need to track the embedded version number.
-RUN sudo mkdir -p /opt/cdf && sudo chown vscode:vscode /opt/cdf && \
+RUN --mount=from=nasa-deps-cache,source=/cache,target=/tmp/docker-cache \
+    sudo mkdir -p /opt/cdf && sudo chown vscode:vscode /opt/cdf && \
     cd /opt/cdf && \
-    wget -q https://spdf.gsfc.nasa.gov/pub/software/cdf/dist/latest_matlab/matlab_cdf_lin64.tar.gz && \
+    if [ -f /tmp/docker-cache/matlab_cdf_lin64.tar.gz ]; then \
+      cp /tmp/docker-cache/matlab_cdf_lin64.tar.gz .; \
+    else \
+      wget -q https://spdf.gsfc.nasa.gov/pub/software/cdf/dist/latest_matlab/matlab_cdf_lin64.tar.gz; \
+    fi && \
     tar xzf matlab_cdf_lin64.tar.gz && \
     rm matlab_cdf_lin64.tar.gz && \
     mv matlab_cdf*_patch-64 matlab_cdf_patch

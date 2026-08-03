@@ -133,6 +133,9 @@ images (see below) — the value in the file is just the local-dev default.
    matlab feature (scraped from the feature's own source, so it stays current
    without manual edits).
 2. Builds one image per release and pushes it to GHCR, tagged by release.
+3. Restores NASA toolkit archives from the GitHub Actions cache before building, so
+   the Docker build can copy them in locally and only fall back to nasa.gov if the
+   cache is empty.
 
 Triggers: push to `main` touching the Dockerfile/devcontainer.json/workflow, a
 schedule (1st and 15th of each month, ~every 2 weeks), or manual dispatch:
