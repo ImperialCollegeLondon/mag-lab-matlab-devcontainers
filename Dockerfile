@@ -15,7 +15,7 @@ USER vscode
 RUN uv python install $PYTHON_VERSIONS --install-dir /home/vscode/.local/bin
 
 RUN sudo apt-get update && sudo apt-get install --no-install-recommends --no-install-suggests -y \
-    postgresql-client wget ca-certificates
+    postgresql-client wget ca-certificates xvfb xauth
 RUN python3 -m pip install --user pipx && \
     python3 -m pipx ensurepath
 RUN pipx ensurepath && \
@@ -52,4 +52,3 @@ RUN sudo mkdir -p /opt/cdf && sudo chown vscode:vscode /opt/cdf && \
 # where MATLAB itself ends up installed (the devcontainer feature installs it after
 # this Dockerfile builds, so we can't addpath() against a known matlabroot here).
 ENV MATLABPATH="/opt/naif/mice/lib:/opt/naif/mice/src/mice:/opt/cdf/matlab_cdf_patch"
-
