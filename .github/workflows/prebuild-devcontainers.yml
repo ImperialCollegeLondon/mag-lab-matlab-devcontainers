@@ -63,9 +63,33 @@ jobs:
       fail-fast: false
       matrix:
         release: ${{ fromJson(needs.discover.outputs.releases) }}
+    env:
+      NASA_DEP_CACHE_DIR: .github/docker-cache
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+
+      - name: Restore NASA dependency cache
+        id: nasa-cache
+        uses: actions/cache/restore@v4
+        with:
+          path: ${{ env.NASA_DEP_CACHE_DIR }}
+          key: nasa-deps-${{ runner.os }}-v1
+
+      - name: Populate NASA dependency cache
+        run: |
+          set -euo pipefail
+          mkdir -p "$NASA_DEP_CACHE_DIR"
+
+          if [ ! -s "$NASA_DEP_CACHE_DIR/mice.tar.Z" ]; then
+            curl -fL https://naif.jpl.nasa.gov/pub/naif/toolkit//MATLAB/PC_Linux_GCC_MATLAB9.x_64bit/packages/mice.tar.Z \
+              -o "$NASA_DEP_CACHE_DIR/mice.tar.Z"
+          fi
+
+          if [ ! -s "$NASA_DEP_CACHE_DIR/matlab_cdf_lin64.tar.gz" ]; then
+            curl -fL https://spdf.gsfc.nasa.gov/pub/software/cdf/dist/latest_matlab/matlab_cdf_lin64.tar.gz \
+              -o "$NASA_DEP_CACHE_DIR/matlab_cdf_lin64.tar.gz"
+          fi
 
       - name: Compute lowercase image name
         id: image
@@ -122,3 +146,10 @@ jobs:
           cacheFrom: ${{ steps.image.outputs.name }}:${{ matrix.release }}
           platform: linux/amd64
           push: always
+
+      - name: Save NASA dependency cache
+        if: always() && steps.nasa-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ env.NASA_DEP_CACHE_DIR }}
+          key: ${{ steps.nasa-cache.outputs.cache-primary-key }}
