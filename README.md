@@ -23,6 +23,7 @@ Registry so other projects don't have to pay the MATLAB install time themselves.
 - [NASA CDF](https://cdf.gsfc.nasa.gov/quickstartguides/MATLAB/) MATLAB patch
 - Python 3.14, [uv](https://github.com/astral-sh/uv), and `pipx`-installed `poetry`/`pre-commit`
 - Node.js, GitHub CLI, Claude Code CLI
+- X11 utilities for headless GUI support (`xvfb-run` via `xvfb`, plus `xauth`)
 
 ## Using the prebuilt image (recommended)
 
