@@ -132,8 +132,12 @@ images (see below) — the value in the file is just the local-dev default.
 1. Discovers the last 4 MATLAB releases supported by the `mathworks/devcontainer-features`
    matlab feature (scraped from the feature's own source, so it stays current
    without manual edits).
-2. Builds one image per release and pushes it to GHCR, tagged by release.
-3. Restores NASA toolkit archives from the GitHub Actions cache before building, so
+2. Runs `devcontainer upgrade` against each generated configuration before building,
+   refreshing the CI checkout's feature lockfile within the configured version tags
+   so new MATLAB releases aren't built using an older pinned MATLAB feature.
+   The checked-in lockfile is unchanged.
+3. Builds one image per release and pushes it to GHCR, tagged by release.
+4. Restores NASA toolkit archives from the GitHub Actions cache before building, so
    the Docker build can copy them in locally and only fall back to nasa.gov if the
    cache is empty.
 
