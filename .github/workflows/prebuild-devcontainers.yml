@@ -71,7 +71,7 @@ jobs:
 
       - name: Restore NASA dependency cache
         id: nasa-cache
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: ${{ env.NASA_DEP_CACHE_DIR }}
           key: nasa-deps-${{ runner.os }}-v1
@@ -148,8 +148,8 @@ jobs:
           push: always
 
       - name: Save NASA dependency cache
-        if: always() && steps.nasa-cache.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v4
+        if: always() && steps.nasa-cache.outputs.cache-hit != 'true' && matrix.release == fromJSON(needs.discover.outputs.releases)[0]
+        uses: actions/cache/save@v5
         with:
           path: ${{ env.NASA_DEP_CACHE_DIR }}
           key: ${{ steps.nasa-cache.outputs.cache-primary-key }}
