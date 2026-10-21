@@ -148,7 +148,7 @@ jobs:
           push: always
 
       - name: Save NASA dependency cache
-        if: always() && steps.nasa-cache.outputs.cache-hit != 'true'
+        if: always() && steps.nasa-cache.outputs.cache-hit != 'true' && matrix.release == fromJSON(needs.discover.outputs.releases)[0]
         uses: actions/cache/save@v5
         with:
           path: ${{ env.NASA_DEP_CACHE_DIR }}
