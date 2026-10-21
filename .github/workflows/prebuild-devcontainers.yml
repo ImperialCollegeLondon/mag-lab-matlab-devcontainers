@@ -123,6 +123,13 @@ jobs:
             console.log('Wrote', process.env.OUT_FILE, 'with release', process.env.RELEASE);
           "
 
+      - name: Upgrade devcontainer features for ${{ matrix.release }}
+        env:
+          CONFIG_FILE: devcontainer.generated.${{ matrix.release }}.json
+        run: |
+          npm install --global --no-fund --no-audit @devcontainers/cli@0.89.0
+          devcontainer upgrade --workspace-folder . --config "$CONFIG_FILE"
+
       - name: Set up Docker Buildx
         # devcontainers/ci exports via `docker buildx build --output type=oci`, which
         # the default "docker" buildx driver on GitHub-hosted runners doesn't support
