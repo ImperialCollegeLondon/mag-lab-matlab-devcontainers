@@ -31,14 +31,13 @@ A GitHub Actions workflow rebuilds this devcontainer for the last 4 MATLAB relea
 every ~2 weeks and publishes it to GHCR, tagged by release:
 
 ```
+ghcr.io/imperialcollegelondon/mag-lab-matlab-devcontainers:r2026b
 ghcr.io/imperialcollegelondon/mag-lab-matlab-devcontainers:r2026a
 ghcr.io/imperialcollegelondon/mag-lab-matlab-devcontainers:r2025b
 ghcr.io/imperialcollegelondon/mag-lab-matlab-devcontainers:r2025a
-ghcr.io/imperialcollegelondon/mag-lab-matlab-devcontainers:r2024b
 ```
 
-In another project, point your `.devcontainer/devcontainer.json` at the image
-directly instead of building it, e.g.:
+In you own project, create a `.devcontainer/devcontainer.json` file with this contents to use this prebuilt image
 
 ```jsonc
 {
@@ -55,6 +54,11 @@ directly instead of building it, e.g.:
 
 This skips the MATLAB install entirely (10-20+ minutes) — see [available tags](
 https://github.com/orgs/ImperialCollegeLondon/packages/container/package/mag-lab-matlab-devcontainers).
+
+Once your devcontainer starts can then run the MATLAB ui:
+- Either as a linux app (via WSL GUI) by running `matlab`
+- OR via a browser: run command `env MWI_APP_PORT=8888 matlab-proxy-app`, open a browser at http:/localhost:8888/. Look for the token in the command line and paste it into the browser
+- OR on the CLI: `matlab -nodesktop -nojvm -batch 'display "hello"'`
 
 ### Live example / demo in GitHub Codespaces
 
