@@ -53,7 +53,11 @@
     // matlab-proxy (started automatically by the matlab feature's startInDesktop option)
     // serves a browser-based MATLAB desktop on this port.
     "containerEnv": {
-        "MWI_APP_PORT": "8888"
+        "MWI_APP_PORT": "8888",
+        // Make Claude Code keep its main config (.claude.json) inside ~/.claude instead of
+        // ~/.claude.json. Projects persist ~/.claude via a volume, so without this the
+        // config file is lost on every container rebuild ("Claude configuration file not found").
+        "CLAUDE_CONFIG_DIR": "/home/vscode/.claude"
     },
     "portsAttributes": {
         "8888": {
