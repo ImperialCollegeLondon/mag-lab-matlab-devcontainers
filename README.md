@@ -41,14 +41,18 @@ In you own project, create a `.devcontainer/devcontainer.json` file with this co
 
 ```jsonc
 {
-    "image": "ghcr.io/imperialcollegelondon/mag-lab-matlab-devcontainers:r2025b",
+    "image": "ghcr.io/imperialcollegelondon/mag-lab-matlab-devcontainers:r2026b",
     "remoteUser": "vscode",
     "containerEnv": {
         "MWI_APP_PORT": "8888"
     },
     "portsAttributes": {
         "8888": { "label": "MATLAB (matlab-proxy)", "onAutoForward": "openPreview" }
-    }
+    },
+    "mounts": [
+        // shared claude code config volume for all containers so that devcontainer rebuilds maintain config
+         "source=claude-code-config,target=/home/vscode/.claude,type=volume",
+    ]
 }
 ```
 
